@@ -7,7 +7,7 @@ var app = express();
 
 app.get('/', (req, res, next) => {
 
-    Presupuesto.find({}).exec((err, presupuestos)=>{
+    Presupuesto.find({}).sort({numero:1}).exec((err, presupuestos)=>{
         if(err){
             return res.status(500).json({
                 ok: false,
@@ -18,6 +18,24 @@ app.get('/', (req, res, next) => {
         res.status(200).json({
             ok: true,
             presupuestos: presupuestos
+        })
+    });
+
+});
+
+app.get('/cliente', (req, res, next) => {
+
+    Presupuesto.aggregate([{$group:{_id:{cliente:"$cliente"},total:{$sum:"$total"}}}]).exec((err, datos)=>{
+        if(err){
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error acceso DB',
+                errores: err
+            })
+        }
+        res.status(200).json({
+            ok: true,
+            datos: datos
         })
     });
 
